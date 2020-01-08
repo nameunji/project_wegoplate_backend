@@ -5,13 +5,13 @@ class Restaurant(models.Model):
     name                    = models.CharField(max_length=300)
     price_range             = models.ForeignKey('Price', on_delete=models.SET_NULL, null=True)
     food                    = models.ForeignKey('Food', on_delete=models.SET_NULL, null=True)
-    location_do             = models.ForeignKey('Location_city', on_delete=models.SET_NULL, null=True)
-    location_gu             = models.ForeignKey('Location_state', on_delete=models.SET_NULL, null=True)
-    location_dong           = models.ForeignKey('Location_road', on_delete=models.SET_NULL, null=True)
+    location_city           = models.ForeignKey('Location_city', on_delete=models.SET_NULL, null=True)
+    location_state          = models.ForeignKey('Location_state', on_delete=models.SET_NULL, null=True)
+    location_road           = models.ForeignKey('Location_road', on_delete=models.SET_NULL, null=True)
     location_detail         = models.CharField(max_length=300)
     holiday                 = models.ForeignKey('Holiday', on_delete=models.SET_NULL, null=True)
     tags_restaurants        = models.ManyToManyField('Tag', through='Restaurant_Tag')
-    Restaurants_top_lists   = models.ManyToManyField('Top_List', through='Top_lists_Restaurant')
+    restaurants_top_lists   = models.ManyToManyField('Top_List', through='Top_lists_Restaurant')
 
     class Meta:
         db_table = 'restaurants'
@@ -50,13 +50,13 @@ class Location_road(models.Model):
 
 class Restaurant_Info(models.Model):
     restaurant      = models.ForeignKey('Restaurant', on_delete=models.SET_NULL, null=True)
-    parking         = models.CharField(max_length=300)
-    number          = models.CharField(max_length=20)
-    last_order      = models.CharField(max_length=45)
-    info            = models.CharField(max_length=300)
-    site            = models.URLField(max_length=2500)
-    breaktime       = models.DateTimeField()
-    opening_horus   = models.DateTimeField()
+    parking         = models.CharField(max_length=300, null=True)
+    number          = models.CharField(max_length=20, null=True)
+    last_order      = models.CharField(max_length=45, null=True)
+    info            = models.CharField(max_length=1000, null=True)
+    site            = models.URLField(max_length=2500, null=True)
+    breaktime       = models.CharField(max_length=100, null=True)
+    opening_hours   = models.CharField(max_length=100, null=True)
 
     class Meta:
         db_table = 'restaurants_info'
@@ -83,7 +83,7 @@ class Holiday(models.Model):
         db_table = 'holidays'
 
 class Tag(models.Model):
-    tag             = models.CharField(max_length=20)
+    tag             = models.CharField(max_length=20, unique=True)
 
     class Meta:
         db_table = 'tags'
@@ -96,13 +96,15 @@ class Restaurant_Tag(models.Model):
         db_table = 'restaurants_tags'
 
 class Eat_Deal(models.Model):
-    restaurant      = models.ForeignKey('Restaurant', on_delete=models.SET_NULL, null=True)
-    price           = models.CharField(max_length=100)
-    start_date      = models.DateTimeField()
-    end_date        = models.DateTimeField()
-    discount_rate   = models.IntegerField()
-    menu            = models.CharField(max_length=300)
-    menu_info       = models.CharField(max_length=1000)
+    restaurant       = models.ForeignKey('Restaurant', on_delete=models.SET_NULL, null=True)
+    restaurant_intro = models.CharField(max_length=300)
+    price            = models.CharField(max_length=100)
+    start_date       = models.DateTimeField()
+    end_date         = models.DateTimeField()
+    discount_rate    = models.IntegerField()
+    menu             = models.CharField(max_length=300)
+    menu_info        = models.CharField(max_length=1000)
+    
 
     class Meta:
         db_table = 'eat_deals'
@@ -110,6 +112,7 @@ class Eat_Deal(models.Model):
 class Top_List(models.Model):
     title           = models.CharField(max_length=100)
     description     = models.CharField(max_length=400)
+    image           = models.URLField(max_length=2500)
     create_at       = models.DateTimeField(auto_now_add=True)
 
     class Meta:
