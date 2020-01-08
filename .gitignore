@@ -1,7 +1,7 @@
 
 # Created by https://www.gitignore.io/api/vim,linux,macos,django,python
 # Edit at https://www.gitignore.io/?templates=vim,linux,macos,django,python
-
+.vscode
 my_settings.py
 
 ### Django ###
