@@ -83,7 +83,7 @@ class Holiday(models.Model):
         db_table = 'holidays'
 
 class Tag(models.Model):
-    tag             = models.CharField(max_length=20, unique=True)
+    tag             = models.CharField(max_length=200, unique=True)
 
     class Meta:
         db_table = 'tags'
@@ -124,3 +124,24 @@ class Top_lists_Restaurant(models.Model):
 
     class Meta:
         db_table = 'top_lists_restaurants'
+
+    
+class Topic(models.Model):
+    title = models.CharField(max_length=200)
+
+    class Meta:
+        db_table = 'topics'
+
+class Topic_Top_list(models.Model):
+    topic = models.ForeignKey('Topic',on_delete=models.SET_NULL, null=True)
+    top_list = models.ForeignKey('Top_List',on_delete=models.SET_NULL, null=True)
+
+    class Meta:
+        db_table = 'topics_top_lists'
+
+class Topic_Restaurant(models.Model):
+    topic       = models.ForeignKey('Topic',on_delete=models.SET_NULL, null=True)
+    restaurant  = models.ForeignKey('Restaurant', on_delete=models.SET_NULL, null=True)
+    
+    class Meta:
+        db_table = 'topics_restaurants'
