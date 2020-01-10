@@ -6,7 +6,7 @@ class User(models.Model):
     facebook    = models.IntegerField(null=True)
     nick_name   = models.CharField(max_length=25, unique=True)
     email       = models.CharField(max_length=50, null=True, unique=True)
-    password    = models.CharField(max_length=400)
+    password    = models.CharField(max_length=400, null=True)
     like_user   = models.ManyToManyField(Restaurant, through='User_Like')
 
     class Meta:
@@ -31,13 +31,14 @@ class Review(models.Model):
 
 class Review_image(models.Model):
     review  = models.ForeignKey('Review', on_delete=models.SET_NULL, null=True)
-    image   = models.URLField(max_length=4500)
+    image   = models.URLField(max_length=4500, null=True)
 
     class Meta:
         db_table = 'review_images'
 
 class Review_Star(models.Model):
-    star = models.IntegerField()
+    star    = models.IntegerField()
+    content = models.CharField(max_length=20)
 
     class Meta:
         db_table = 'review_stars'
