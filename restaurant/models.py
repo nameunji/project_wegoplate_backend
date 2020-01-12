@@ -113,6 +113,7 @@ class Top_List(models.Model):
     title           = models.CharField(max_length=100)
     description     = models.CharField(max_length=400)
     image           = models.URLField(max_length=2500)
+    top_lists_topics = models.ManyToManyField('Topic', through='Topic_Top_list')
     create_at       = models.DateTimeField(auto_now_add=True)
 
     class Meta:
