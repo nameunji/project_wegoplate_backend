@@ -1,11 +1,18 @@
 import json
 
-from .models          import *
-from user.models      import Review, Review_Star
-
 from django.http      import JsonResponse
 from django.views     import View
 from django.db.models import Avg
+
+from .models import (
+        Topic, 
+        Topic_Top_list,
+        Restaurant_image, 
+        Restaurant, 
+        Restaurant_Info,
+        Restaurant_Tag
+    )
+from user.models import Review, Review_image, Review_Star
 
 class TopTopic(View):
     def get(self, request, topic_id):
@@ -25,7 +32,6 @@ class TopTopic(View):
         except Topic.DoesNotExist:
             return JsonResponse({'result' : 'DOES_NOT_EXIST_TOPIC'}, status = 400)
 
-
 class RestaurantView(View):
     def get(self, request, topic_id):
         restaurants = Topic_Restaurant.objects.select_related('topic','restaurant').filter(topic_id = topic_id)
@@ -43,3 +49,10 @@ class RestaurantView(View):
             return JsonResponse({"title" : topic_title, "restaurant_list" : restaurant_list}, status=200)
         else:
             return JsonResponse({"message":"DOES_NOT_EXIST_TOPIC"}, status = 400)
+
+class DetailTopImage(View):
+    def get(self, request, restaurant_id):
+        image = Restaurant_image.objects.filter(restaurant_id = restaurant_id).values_list('images', flat=True)
+
+        return JsonResponse({'image' : list(image)})
+
