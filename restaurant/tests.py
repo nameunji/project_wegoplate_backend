@@ -5,19 +5,7 @@ from django.test       import Client
 from django.db.models  import Avg
 
 from user.models       import User, Review, Review_Star
-from restaurant.models import(
-    Top_List, 
-    Topic,
-    Topic_Top_list,
-    Restaurant_image,
-    Restaurant,
-    Location_city,
-    Location_state,
-    Location_road,
-    Price,
-    Holiday,
-    Food
-    )
+from restaurant.models import *
 
 class MainTopList(TestCase):
     def setUp(self):
@@ -73,6 +61,23 @@ class MainTopList(TestCase):
             location_detail   = '12-1번지',
             holiday_id        = 1
         )
+        Restaurant_Info.objects.create(
+            id              = 1,
+            restaurant_id   = 1,
+            parking         = '주차공간없음',
+            number          = '02-0000-0000',
+            last_order      = '10시',
+            info            = 'test',
+            site            = 'https://www.google.com',
+            breaktime       = None,
+            opening_hours   = None
+        )
+        Menu.objects.create(
+            id            = 1,
+            restaurant_id = 1,
+            menu          = '테스트메뉴1',
+            price         = '100원'
+        )
         Restaurant_image.objects.create(
             id = 1,
             restaurant_id = 1,
@@ -112,6 +117,8 @@ class MainTopList(TestCase):
         Review_Star.objects.all().delete()
         User.objects.all().delete()
         Restaurant_image.objects.all().delete()
+        Menu.objects.all().delete()
+        Restaurant_Info.objects.all().delete()
         Restaurant.objects.all().delete()
         Food.objects.all().delete()
         Location_road.objects.all().delete()
@@ -164,6 +171,25 @@ class MainTopList(TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {"message":"DOES_NOT_EXIST_TOPIC"})
+
+    def test_restaurant_detail_info(self):
+        client = Client()
+        response = client.get('/restaurant/1/info')
+
+        result = [
+            { "title": "주소", "content": ["서울 은평구 녹번동 12-1번지"]},
+            { "title": "음식 종류", "content": ["한식"]},
+            { "title": "가격대", "content": ["만원 미만"]},
+            { "title": "휴일", "content": ["월"]},
+            { "title": "주차", "content": ["주차공간없음"]},
+            { "title": "전화번호", "content": ["02-0000-0000"]},
+            { "title": "마지막주문", "content": ["10시"]},
+            { "title": "웹 사이트", "content": ["https://www.google.com"]},
+            { "title": "메뉴", "content": [{"menu":"테스트메뉴1","price":"100원"}]}
+        ]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(),{"result":result})
 
 class DetailTopImageBar(TestCase):
     def setUp(self):
