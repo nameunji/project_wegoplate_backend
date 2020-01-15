@@ -267,6 +267,7 @@ class DetailTopImageBar(TestCase):
 
         Restaurant.objects.create(
             id = 1,
+            name = 'name',
             price_range_id = 1,
             food_id = 1,
             location_city_id = 1,
@@ -325,6 +326,7 @@ class DetailTopImageBar(TestCase):
                 ]     
             }
         )
+
     def test_detail_review(self):
         client = Client()
 
@@ -339,13 +341,49 @@ class DetailTopImageBar(TestCase):
                 'bad_count' : 0,
                 'result' : [
                     {
-                        'name' : ['test'],
-                        'rating' :['good'],
-                        'text' : ['Hi'],
+                        'name' : 'test',
+                        'rating' :'good',
+                        'text' : 'Hi',
                         'imglist' : ['https://mp-seoul-image-production-s3.mangoplate.com/572525_1578455243664775.jpg'],
-                        'time' : ['2020-1-15']
+                        'time' : '2020-1-15'
                     }
                 ]
+            }
+        )
+
+    def test_detail_near_restaurant(self):
+        client = Client()
+
+        response = client.get('/restaurant/1/near')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            {
+                'result' : [
+                    {
+                        'id' : 1,
+                        'title' : 'name',
+                        'food' : '치킨',
+                        'price' : '1만원',
+                        'location' : '동작구',
+                        'img' : {
+                            'images' : 'https://mp-seoul-image-production-s3.mangoplate.com/keyword_search/meta/pictures/7zsdxmpu4kauzpk7.jpg'
+                        },
+                        'avg' : 5.0
+                    }
+                ]
+            }
+        )
+
+    def test_detail_near_not_exist_restaurant(self):
+        client = Client()
+
+        response = client.get('/restaurant/250/near')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.json(),
+            {
+                'message' : 'DOES_NOT_EXIST_RESTAURANT'
             }
         )
 

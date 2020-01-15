@@ -151,3 +151,24 @@ class DetailReview(View):
             }
         )
 
+class RestaurantNearView(View):
+    def get(self, request, restaurant_id):
+        try:
+            location_state = Restaurant.objects.get(id = restaurant_id).location_state
+            around_restaurant = Restaurant.objects.select_related('food','location_state','price_range').prefetch_related('restaurant_image_set','review_set').filter(location_state_id = location_state.id)
+
+            restaurants = [
+                {
+                    'id' : restaurant.id,
+                    'title' : restaurant.name,
+                    'food' :restaurant.food.category,
+                    'price' : restaurant.price_range.price_range,
+                    'location' : restaurant.location_state.state,
+                    'img' : restaurant.restaurant_image_set.values('images')[0],
+                    'avg' : restaurant.review_set.filter(restaurant_id = restaurant.id).values('review_star__star').aggregate(avg=Avg('review_star__star'))['avg']
+                }
+            for restaurant in list(around_restaurant)[:4]]
+
+            return JsonResponse({'result' : restaurants}, status = 200)
+        except Restaurant.DoesNotExist:
+            return JsonResponse({"message":"DOES_NOT_EXIST_RESTAURANT"}, status = 400)
