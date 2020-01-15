@@ -1,5 +1,14 @@
-from django.urls import path
-from .views       import TopTopic, RestaurantView, DetailTopImage, RestaurantDetailInfoView, RestaurantDetailToplistView, RestaurantNearView, DetailReview
+from django.urls  import path
+from .views       import (
+    TopTopic,
+    RestaurantView,
+    DetailTopImage,
+    RestaurantDetailInfoView,
+    RestaurantDetailToplistView,
+    DetailReview,
+    RestaurantNearView,
+    RestaurantDetailToplistRelatedView
+)
 
 urlpatterns = [
     path('/topic/<int:topic_id>', TopTopic.as_view()),
@@ -9,4 +18,5 @@ urlpatterns = [
     path('/<int:restaurant_id>/toplist', RestaurantDetailToplistView.as_view()),
     path('/<int:restaurant_id>/review', DetailReview.as_view()),
     path('/<int:restaurant_id>/near', RestaurantNearView.as_view()),
+    path('/<int:restaurant_id>/related', RestaurantDetailToplistRelatedView.as_view())
 ]

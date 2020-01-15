@@ -172,3 +172,24 @@ class RestaurantNearView(View):
             return JsonResponse({'result' : restaurants}, status = 200)
         except Restaurant.DoesNotExist:
             return JsonResponse({"message":"DOES_NOT_EXIST_RESTAURANT"}, status = 400)
+
+class RestaurantDetailToplistRelatedView(View):
+    def get(self, request, restaurant_id):
+        try:
+            toplist_id    = Top_lists_Restaurant.objects.filter(restaurant_id=restaurant_id).select_related('top_list').order_by('top_list__create_at')[0].top_list_id
+            restaurants   = Top_lists_Restaurant.objects.select_related('top_list','restaurant').filter(top_list_id = toplist_id)[:4]
+            toplist_title = restaurants[0].top_list.title
+
+            restaurant_list = [{
+                'id'    : el.restaurant.id,
+                'name'  : el.restaurant.name,
+                'state' : el.restaurant.location_state.state,
+                'food'  : el.restaurant.food.category,
+                'image' : el.restaurant.restaurant_image_set.get(restaurant_id = el.restaurant.id).images,
+                'grade' : el.restaurant.review_set.filter(restaurant_id = el.restaurant.id).values('review_star__star').aggregate(avg=Avg('review_star__star'))['avg']
+            } for el in restaurants]
+
+            return JsonResponse({"title" : toplist_title, "restaurant_list" : restaurant_list}, status=200)
+
+        except IndexError:
+            return HttpResponse(status = 400)

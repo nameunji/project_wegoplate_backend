@@ -228,6 +228,25 @@ class MainTopList(TestCase):
 
         self.assertEqual(response.status_code, 404)
 
+    def test_Restaurant_Detail_Toplist_Related(self):
+        client = Client()
+        response = client.get('/restaurant/1/related')
+
+        toplist_title = '2020 제주 인기 맛집 TOP 60'
+        restaurant_list = [{
+            'id'    : 1,
+            'name'  : '테스트 레스토랑',
+            'state' : '은평구',
+            'food'  : '한식',
+            'image' : 'https://mp-seoul-image-production-s3.mangoplate.com/10226_1439659099246',
+            'grade' : 5.0
+        }]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"title":toplist_title, "restaurant_list":restaurant_list})
+
+    
+
 
 class DetailTopImageBar(TestCase):
     def setUp(self):
