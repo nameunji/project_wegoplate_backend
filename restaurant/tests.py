@@ -106,9 +106,15 @@ class MainTopList(TestCase):
             content = '맛있습니다',
             review_star_id = 1
         )
+        Top_lists_Restaurant.objects.create(
+            id = 1,
+            restaurant_id = 1,
+            top_list_id = 1
+        )
  
 
     def tearDown(self):
+        Top_lists_Restaurant.objects.all().delete()
         Topic.objects.all().delete()
         Top_List.objects.all().delete()
         Topic_Top_list.objects.all().delete()
@@ -190,6 +196,38 @@ class MainTopList(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(),{"result":result})
+    
+    def test_Restaurant_Detail_Toplist(self):
+        client = Client()
+        response = client.get('/restaurant/1/toplist')
+
+        toplist = [{
+            'id'          : 1,
+            'title'       : '2020 제주 인기 맛집 TOP 60',
+            'description' : '제주의 인기 맛집만 쏙쏙 골라 모았다!!!',
+            'image'       : 'https://mp-seoul-image-production-s3.mangoplate.com/keyword_search/meta/pictures/7zsdxmpu4kauzpk7.jpg'
+        }]
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"result" : toplist})
+    
+    def test_Restaurant_Detail_Toplist_not_exists(self):
+        client = Client()
+        response = client.get('/restaurant/2/toplist')
+
+        Restaurant.objects.create(
+            id = 2,
+            name              = '테스트 레스토랑2',
+            price_range_id    = 1,
+            food_id           = 1,
+            location_city_id  = 1,
+            location_state_id = 1,
+            location_road_id  = 1,
+            location_detail   = '12-1번지',
+            holiday_id        = 1
+        )
+
+        self.assertEqual(response.status_code, 404)
+
 
 class DetailTopImageBar(TestCase):
     def setUp(self):
@@ -267,4 +305,5 @@ class DetailTopImageBar(TestCase):
             Location_city.objects.all().delete()
             Food.objects.all().delete()
             Price.objects.all().delete()
+
 

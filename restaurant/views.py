@@ -43,6 +43,7 @@ class RestaurantView(View):
         else:
             return JsonResponse({"message":"DOES_NOT_EXIST_TOPIC"}, status = 400)
 
+
 class DetailTopImage(View):
     def get(self, request, restaurant_id):
         image = Restaurant_image.objects.filter(restaurant_id = restaurant_id).values_list('images', flat=True)
@@ -97,3 +98,21 @@ class RestaurantDetailInfoView(View):
             return JsonResponse({"result":result}, status = 200)
         except Restaurant.DoesNotExist:
             return HttpResponse(status = 404)
+
+class RestaurantDetailToplistView(View):
+    def get(self, request, restaurant_id):
+        toplists = Top_lists_Restaurant.objects.select_related('top_list', 'restaurant').filter(restaurant_id=restaurant_id)
+
+        if toplists.exists():
+            toplist = [
+                {
+                    "id"          : el.top_list.id,
+                    "title"       : el.top_list.title,
+                    "description" : el.top_list.description,
+                    "image"       : el.top_list.image
+                } for el in toplists]
+            return JsonResponse({"result" : toplist}, status = 200)
+        else:
+            return HttpResponse(status = 404)
+
+
