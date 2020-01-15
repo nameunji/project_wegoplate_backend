@@ -4,7 +4,7 @@ from django.test       import TestCase
 from django.test       import Client
 from django.db.models  import Avg
 
-from user.models       import User, Review, Review_Star
+from user.models       import User, Review, Review_Star, Review_image
 from restaurant.models import *
 
 class MainTopList(TestCase):
@@ -282,6 +282,36 @@ class DetailTopImageBar(TestCase):
             restaurant_id = 1
         )
 
+        User.objects.create(
+            id = 1,
+            nick_name = 'test',
+            email     = 'test@naver.com',
+            password  = 'test1234'
+        )
+
+        Review_Star.objects.create(
+            id = 1,
+            star = 5,
+            content = 'good'
+        )
+
+        Review.objects.create(
+            id = 1,
+            user_id = 1,
+            restaurant_id = 1,
+            content = 'Hi',
+            review_star_id = 1,
+            create_at = '2020-1-12'
+        )
+
+        Review_image.objects.create(
+            id = 1,
+            image = 'https://mp-seoul-image-production-s3.mangoplate.com/572525_1578455243664775.jpg',
+            review_id = 1
+        )
+
+
+
     def test_detail_top_image(self):
         client = Client()
 
@@ -295,15 +325,38 @@ class DetailTopImageBar(TestCase):
                 ]     
             }
         )
+    def test_detail_review(self):
+        client = Client()
 
-        def tearDown(self):
-            Restaurant_image.objects.all().delete()
-            Restaurant.objects.all().delete()
-            Holiday.objects.all().delete()
-            Location_road.objects.all().delete()
-            Location_state.objects.all().delete()
-            Location_city.objects.all().delete()
-            Food.objects.all().delete()
-            Price.objects.all().delete()
+        response = client.get('/restaurant/1/review')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            {
+                'total_count' : 1,
+                'good_count' : 1,
+                'soso_count' : 0,
+                'bad_count' : 0,
+                'result' : [
+                    {
+                        'name' : ['test'],
+                        'rating' :['good'],
+                        'text' : ['Hi'],
+                        'imglist' : ['https://mp-seoul-image-production-s3.mangoplate.com/572525_1578455243664775.jpg'],
+                        'time' : ['2020-1-15']
+                    }
+                ]
+            }
+        )
+
+    def tearDown(self):
+        Restaurant_image.objects.all().delete()
+        Restaurant.objects.all().delete()
+        Holiday.objects.all().delete()
+        Location_road.objects.all().delete()
+        Location_state.objects.all().delete()
+        Location_city.objects.all().delete()
+        Food.objects.all().delete()
+        Price.objects.all().delete()
 
 
