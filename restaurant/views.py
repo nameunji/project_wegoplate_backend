@@ -207,3 +207,26 @@ class RestaurantTagview(View):
 
         return JsonResponse({'result' : tags}, status = 200)
 
+class RestaurantEatDealView(View):
+    def get(self,request):
+        
+        offset = int(request.GET.get('offset', 0))
+        limit = int(request.GET.get('limit', 20))
+
+        eat_deal_list = Eat_Deal.objects.select_related('restaurant')[offset * limit:(offset + 1) * limit]
+        eat_deals = [
+            {
+                'offset' : offset,
+                'eat_deal_id' :eat_deal.id,
+                'title' : eat_deal.restaurant.name,
+                'restaurant_id' : eat_deal.restaurant.id,
+                'image' : list(eat_deal.restaurant.restaurant_image_set.values('images'))[0],
+                'menu' : eat_deal.menu,
+                'discount_rate' : eat_deal.discount_rate,
+                'price' : int(eat_deal.price),
+                'discounted_price' : int(eat_deal.price) - (int(eat_deal.price) * int(eat_deal.discount_rate)/100)
+            }
+        for eat_deal in list(eat_deal_list)]
+
+        return JsonResponse({'result' : eat_deals}, status=200)
+

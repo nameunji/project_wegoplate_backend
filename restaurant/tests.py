@@ -1,9 +1,11 @@
 import json
+import datetime
 
 from django.test       import TestCase
 from django.test       import Client
 from django.db.models  import Avg
 
+from freezegun         import freeze_time
 from user.models       import User, Review, Review_Star, Review_image
 from restaurant.models import *
 
@@ -249,6 +251,7 @@ class MainTopList(TestCase):
 
 
 class DetailTopImageBar(TestCase):
+    @freeze_time("2012-01-14")
     def setUp(self):
         client = Client()
 
@@ -321,7 +324,7 @@ class DetailTopImageBar(TestCase):
             restaurant_id = 1,
             content = 'Hi',
             review_star_id = 1,
-            create_at = '2020-1-12'
+            create_at = datetime.datetime.now()
         )
 
         Review_image.objects.create(
@@ -329,6 +332,7 @@ class DetailTopImageBar(TestCase):
             image = 'https://mp-seoul-image-production-s3.mangoplate.com/572525_1578455243664775.jpg',
             review_id = 1
         )
+
 
         Tag.objects.create(
             id = 1,
@@ -339,6 +343,18 @@ class DetailTopImageBar(TestCase):
             id = 1,
             restaurant_id = 1,
             tag_id = 1
+        )
+        
+        Eat_Deal.objects.create(
+            id = 1,
+            price = '1000',
+            start_date = '2020-01-13',
+            end_date = '2020-04-14',
+            discount_rate = 15,
+            menu = '삼겹살',
+            menu_info = '맛있다',
+            restaurant_id = 1,
+            restaurant_intro = '맛있어'
         )
 
 
@@ -375,16 +391,18 @@ class DetailTopImageBar(TestCase):
                         'rating' :'good',
                         'text' : 'Hi',
                         'imglist' : ['https://mp-seoul-image-production-s3.mangoplate.com/572525_1578455243664775.jpg'],
-                        'time' : '2020-1-15'
+                        'time' : '2012-1-14'
                     }
                 ]
             }
         )
 
+
     def test_detail_near_restaurant(self):
         client = Client()
 
         response = client.get('/restaurant/1/near')
+
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.json(),
@@ -426,11 +444,41 @@ class DetailTopImageBar(TestCase):
         self.assertEqual(
             response.json(),
             {
+
                 'result' : 
                 [
                     {
                         'id' : 1,
-                        'tag' : '여기다'   
+                        'tag' : '여기다' 
+                    }
+                ]
+            }
+        )  
+
+
+    def test_eat_deal(self):
+        client = Client()
+
+        response = client.get('/restaurant/eat_deal')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            {
+                'result' : [
+                    {
+                        'offset' : 0,
+                        'limit' : 20,
+                        'eat_deal_id' : 1,
+                        'title' : 'name',
+                        'restaurant_id' : 1,
+                        'image' : {
+                           'images' : 'https://mp-seoul-image-production-s3.mangoplate.com/keyword_search/meta/pictures/7zsdxmpu4kauzpk7.jpg'
+                        },
+                        'menu' : '삼겹살',
+                        'discount_rate' : 15,
+                        'price' : 1000,
+                        'discounted_price' : 850.0
                     }
                 ]
             }
@@ -445,5 +493,10 @@ class DetailTopImageBar(TestCase):
         Location_city.objects.all().delete()
         Food.objects.all().delete()
         Price.objects.all().delete()
+        Review.objects.all().delete()
+        User.objects.all().delete()
+        Review_Star.objects.all().delete()
+        Review_image.objects.all().delete()
+        Eat_Deal.objects.all().delete()
 
 

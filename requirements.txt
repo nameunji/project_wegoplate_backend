@@ -12,3 +12,4 @@ PyJWT==1.7.1
 pytz==2019.3
 six==1.13.0
 sqlparse==0.3.0
+freezegun==0.3.13
