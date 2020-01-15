@@ -7,7 +7,8 @@ from .views       import (
     RestaurantDetailToplistView,
     DetailReview,
     RestaurantNearView,
-    RestaurantDetailToplistRelatedView
+    RestaurantDetailToplistRelatedView,
+    RestaurantTagview
 )
 
 urlpatterns = [
@@ -18,5 +19,6 @@ urlpatterns = [
     path('/<int:restaurant_id>/toplist', RestaurantDetailToplistView.as_view()),
     path('/<int:restaurant_id>/review', DetailReview.as_view()),
     path('/<int:restaurant_id>/near', RestaurantNearView.as_view()),
-    path('/<int:restaurant_id>/related', RestaurantDetailToplistRelatedView.as_view())
+    path('/<int:restaurant_id>/related', RestaurantDetailToplistRelatedView.as_view()),
+    path('/<int:restaurant_id>/tag', RestaurantTagview.as_view())
 ]
