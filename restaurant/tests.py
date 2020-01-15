@@ -4,8 +4,20 @@ from django.test       import TestCase
 from django.test       import Client
 from django.db.models  import Avg
 
-from restaurant.models import *
 from user.models       import User, Review, Review_Star
+from restaurant.models import(
+    Top_List, 
+    Topic,
+    Topic_Top_list,
+    Restaurant_image,
+    Restaurant,
+    Location_city,
+    Location_state,
+    Location_road,
+    Price,
+    Holiday,
+    Food
+    )
 
 class MainTopList(TestCase):
     def setUp(self):
@@ -129,7 +141,6 @@ class MainTopList(TestCase):
             }
         )
 
-
     def test_restaurant(self):
         client = Client()
         response = client.get('/restaurant/1')
@@ -153,4 +164,81 @@ class MainTopList(TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {"message":"DOES_NOT_EXIST_TOPIC"})
+
+class DetailTopImageBar(TestCase):
+    def setUp(self):
+        client = Client()
+
+        Location_city.objects.create(
+            id = 1,
+            city = '서울시'
+        )
+
+        Location_state.objects.create(
+            id = 1,
+            state = '동작구',
+            city_id = 1
+        )
+        
+        Location_road.objects.create(
+            id = 1,
+            road = '상도로',
+            state_id = 1
+        )
+
+        Food.objects.create(
+            id = 1,
+            category = '치킨'
+        )
+
+        Price.objects.create(
+            id = 1,
+            price_range = '1만원'
+        )
+
+        Holiday.objects.create(
+            id = 1,
+            holiday = '일'
+        )
+
+        Restaurant.objects.create(
+            id = 1,
+            price_range_id = 1,
+            food_id = 1,
+            location_city_id = 1,
+            location_state_id = 1,
+            location_road_id = 1,
+            location_detail = '14',
+            holiday_id = 1
+        )
+
+        Restaurant_image.objects.create(
+            id = 1,
+            images ='https://mp-seoul-image-production-s3.mangoplate.com/keyword_search/meta/pictures/7zsdxmpu4kauzpk7.jpg',
+            restaurant_id = 1
+        )
+
+    def test_detail_top_image(self):
+        client = Client()
+
+        response = client.get('/restaurant/1/topimage')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            {
+                'image' : [
+                     'https://mp-seoul-image-production-s3.mangoplate.com/keyword_search/meta/pictures/7zsdxmpu4kauzpk7.jpg'   
+                ]     
+            }
+        )
+
+        def tearDown(self):
+            Restaurant_image.objects.all().delete()
+            Restaurant.objects.all().delete()
+            Holiday.objects.all().delete()
+            Location_road.objects.all().delete()
+            Location_state.objects.all().delete()
+            Location_city.objects.all().delete()
+            Food.objects.all().delete()
+            Price.objects.all().delete()
 
