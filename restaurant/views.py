@@ -115,4 +115,39 @@ class RestaurantDetailToplistView(View):
         else:
             return HttpResponse(status = 404)
 
+class DetailReview(View):
+    def get(self,request, restaurant_id):
+
+        offset = request.GET.get('offset',0)
+        limit = request.GET.get('limit', 5)
+        review_star = request.GET.get('taste', None)
+
+        restaurant_review = Review.objects.select_related('user','review_star').prefetch_related('review_image_set').filter(restaurant_id = restaurant_id)
+    
+        if review_star == None:
+            restaurant_rate = restaurant_review.order_by('-create_at')
+        else:
+            restaurant_rate = restaurant_review.filter(review_star_id = review_star).order_by('-create_at')
+
+        reviews = [
+            {
+                'name' : review.user.nick_name,
+                'rating' : review.review_star.content,
+                'text' : review.content,
+                'imglist' : list(review.review_image_set.values_list('image', flat=True)),
+                'time' : str(review.create_at.year) + '-' + 
+                           str(review.create_at.month) + '-' + 
+                           str(review.create_at.day)
+            }
+        for review in list(restaurant_rate[int(offset):int(limit)])]
+
+        return JsonResponse(
+            {
+                'total_count' : restaurant_rate.count(),
+                'good_count' : restaurant_rate.filter(review_star_id = 1).count(),
+                'soso_count' : restaurant_rate.filter(review_star_id = 2).count(),
+                'bad_count' :restaurant_rate.filter(review_star_id = 3).count(),
+                'result' : reviews
+            }
+        )
 
