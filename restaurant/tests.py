@@ -576,7 +576,7 @@ class DetailTopImageBar(TestCase):
     def teat_eat_deal_detail(self):
         client = Client()
 
-        response = client.get('/1/eat_deal_detail')
+        response = client.get('/restaurant/1/eat_deal_detail')
         
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -603,12 +603,41 @@ class DetailTopImageBar(TestCase):
     def test_eat_deal_detail_not_exist(self):
         client = Client()
 
-        response = client.get('/250/eat_deal_detail')
+        response = client.get('/restaurant/250/eat_deal_detail')
         self.assertEqual(response.status_code, 404)
         self.assertEqual(
             response.json(),
             {
                 'result' : 'DOES_NOT_EXIST_EAT_DEAL'
+            }
+        )
+
+    def test_eat_deal_location(self):
+        client = Client()
+
+        response = client.get('/restaurant/eat_deal_location?city=1')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            {
+                'result' : [
+                    {
+                        'id' : 1,
+                        'state' : '동작구'
+                    }
+                ]
+            }
+        )
+
+    def test_eat_deal_location_not_exist(self):
+        client = Client()
+
+        response = client.get('/restaurant/eat_deal_location?city=3000')
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(
+            response.json(),
+            {
+                'result' : 'DOES_NOT_EXIST_EAT_DEAL_LOCATION'
             }
         )
 
