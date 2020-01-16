@@ -120,11 +120,11 @@ class DetailReview(View):
 
         offset = request.GET.get('offset',0)
         limit = request.GET.get('limit', 5)
-        review_star = request.GET.get('taste', None)
+        review_star = request.GET.get('taste', 4)
 
         restaurant_review = Review.objects.select_related('user','review_star').prefetch_related('review_image_set').filter(restaurant_id = restaurant_id)
     
-        if review_star == None:
+        if review_star == 4:
             restaurant_rate = restaurant_review.order_by('-create_at')
         else:
             restaurant_rate = restaurant_review.filter(review_star_id = review_star).order_by('-create_at')
@@ -193,3 +193,17 @@ class RestaurantDetailToplistRelatedView(View):
 
         except IndexError:
             return HttpResponse(status = 400)
+
+class RestaurantTagview(View):
+    def get(self, request, restaurant_id):
+
+        restaurant_tags = Restaurant_Tag.objects.select_related('restaurant','tag').filter(restaurant_id = restaurant_id)
+        tags = [
+            {   
+                'id' : tag.tag.id,
+                'tag' : tag.tag.tag
+            }
+        for tag in restaurant_tags]
+
+        return JsonResponse({'result' : tags}, status = 200)
+

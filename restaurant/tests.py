@@ -330,6 +330,17 @@ class DetailTopImageBar(TestCase):
             review_id = 1
         )
 
+        Tag.objects.create(
+            id = 1,
+            tag = '여기다'
+        )
+
+        Restaurant_Tag.objects.create(
+            id = 1,
+            restaurant_id = 1,
+            tag_id = 1
+        )
+
 
 
     def test_detail_top_image(self):
@@ -403,6 +414,25 @@ class DetailTopImageBar(TestCase):
             response.json(),
             {
                 'message' : 'DOES_NOT_EXIST_RESTAURANT'
+            }
+        )
+    
+    def test_detail_restaurant_tag(self):
+        client = Client()
+
+        response = client.get('/restaurant/1/tag')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            {
+                'result' : 
+                [
+                    {
+                        'id' : 1,
+                        'tag' : '여기다'   
+                    }
+                ]
             }
         )
 
