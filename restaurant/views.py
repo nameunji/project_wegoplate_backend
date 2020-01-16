@@ -295,3 +295,31 @@ class SearchFinalView(View):
             return JsonResponse({"restaurant_list" : restaurant_list}, status=200)
         else:
             return JsonResponse({"message":"VALUE_DOES_NOT_EXIST"}, status = 400)
+
+class RestaurantEatDealDetail(View):
+    def get(self, request, eat_deal_id):
+        try:
+            eat_deal_detail = Eat_Deal.objects.select_related('restaurant').get(id = eat_deal_id)
+            date = eat_deal_detail.end_date - eat_deal_detail.start_date
+            eat_deal_data = {
+                    'eat_deal_id' : eat_deal_detail.id,
+                    'image' : list(eat_deal_detail.restaurant.restaurant_image_set.values('images'))[0],
+                    'title' : eat_deal_detail.restaurant.name,
+                    'menu' : eat_deal_detail.menu,
+                    'menu_info' : eat_deal_detail.menu_info,
+                    'restaurant_id' : eat_deal_detail.restaurant.id,
+                    'restaurant_info' : eat_deal_detail.restaurant_intro,
+                    'start_date' : str(eat_deal_detail.start_date.year) + '-' + 
+                            str(eat_deal_detail.start_date.month) + '-' + 
+                            str(eat_deal_detail.start_date.day),
+                    'end_date' : str(eat_deal_detail.end_date.year) + '-' + 
+                            str(eat_deal_detail.end_date.month) + '-' + 
+                            str(eat_deal_detail.end_date.day),
+                    'price' : int(eat_deal_detail.price),
+                    'discount_rate' : eat_deal_detail.discount_rate,
+                    'discounted_price' : int(eat_deal_detail.price) - (int(eat_deal_detail.price) * int(eat_deal_detail.discount_rate)/100),
+                    'remaining_date' : date.days
+                }
+            return JsonResponse({'result' : eat_deal_data}, status = 200)
+        except Eat_Deal.DoesNotExist:
+            return JsonResponse({'result' :'DOES_NOT_EXIST_EAT_DEAL'}, status=404)
