@@ -468,7 +468,33 @@ class DetailTopImageBar(TestCase):
                 'result' : [
                     {
                         'offset' : 0,
-                        'limit' : 20,
+                        'eat_deal_id' : 1,
+                        'title' : 'name',
+                        'restaurant_id' : 1,
+                        'image' : {
+                           'images' : 'https://mp-seoul-image-production-s3.mangoplate.com/keyword_search/meta/pictures/7zsdxmpu4kauzpk7.jpg'
+                        },
+                        'menu' : '삼겹살',
+                        'discount_rate' : 15,
+                        'price' : 1000,
+                        'discounted_price' : 850.0
+                    }
+                ]
+            }
+        )
+
+    def teat_eat_deal_search(self):
+        client = Client()
+
+        response = client.get('/restaurant/eat_deal?list=1')
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            {
+                "result": [
+                    {
+                        'offset' : 0,
                         'eat_deal_id' : 1,
                         'title' : 'name',
                         'restaurant_id' : 1,
