@@ -2,6 +2,7 @@ import json
 
 from .models          import *
 from user.models      import Review, Review_image, Review_Star
+from user.utils       import login_decorator
 
 from django.views     import View
 from django.db.models import Avg
@@ -150,6 +151,19 @@ class DetailReview(View):
                 'result' : reviews
             }
         )
+        
+    @login_decorator
+    def post(self, request, restaurant_id):
+        data = json.loads(request.body)
+        user = request.user
+        
+        Review(
+            user           = user,
+            restaurant_id  = data["restaurant_id"],
+            content        = data["content"],
+            review_star    = Review_Star.objects.get(content = data["star"])
+        ).save()
+        return HttpResponse(status = 200)
 
 class RestaurantNearView(View):
     def get(self, request, restaurant_id):
