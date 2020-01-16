@@ -268,3 +268,30 @@ class RestaurantEatDealSearchView(View):
         for eat_deal in list(eat_deal_list)]
 
         return JsonResponse({'result' : eat_deals}, status=200)
+
+class SearchView(View):
+    def get(self, request):
+        data = request.GET.get('text', None)
+
+        restaurants = Restaurant.objects.filter(name__icontains = data)
+        result = [restaurant.name for restaurant in restaurants]
+
+        return JsonResponse({"result":result}, status =200)
+
+class SearchFinalView(View):
+    def get(self, request, text):
+        restaurants = Restaurant.objects.select_related('food', 'location_city', 'location_state', 'location_road').filter(name__icontains = text)
+
+        if restaurants.exists():  
+            restaurant_list= [{
+                'id'     : el.id,
+                'name'   : el.name,
+                'state'  : el.location_state.state,
+                'address': '{} {} {} {}'.format(el.location_city.city, el.location_state.state, el.location_road.road, el.location_detail),
+                'food'   : el.food.category,
+                'image'  : el.restaurant_image_set.filter(restaurant_id = el.id)[0].images,
+                'grade'  : el.review_set.filter(restaurant_id = el.id).values('review_star__star').aggregate(avg=Avg('review_star__star'))['avg']
+            } for el in restaurants]
+            return JsonResponse({"restaurant_list" : restaurant_list}, status=200)
+        else:
+            return JsonResponse({"message":"VALUE_DOES_NOT_EXIST"}, status = 400)
