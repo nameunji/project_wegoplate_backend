@@ -274,6 +274,44 @@ class MainTopList(TestCase):
         response = client.post('/restaurant/1/review', json.dumps(test), **{'HTTP_AUTHORIZATION':access_token,'content_type' : 'application/json'})
 
         self.assertEqual(response.status_code, 200)
+
+    def test_search_keyword(self):
+        client = Client()
+        response = client.get('/restaurant/keyword?text=테')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"result":["테스트 레스토랑"]})
+
+    def test_search_keyword_not_exist(self):
+        client = Client()
+        response = client.get('/restaurant/keyword?text=팽')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"result":[]})
+
+    def test_search_final(self):
+        client = Client()
+        response = client.get('/restaurant/search/테스트')
+        
+        result = [{
+            'id'     : 1,
+            'name'   : '테스트 레스토랑',
+            'state'  : '은평구',
+            'address': '서울 은평구 녹번동 12-1번지',
+            'food'   : '한식',
+            'image'  : 'https://mp-seoul-image-production-s3.mangoplate.com/10226_1439659099246',
+            'grade'  : 5.0
+        }]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"restaurant_list" : result})
+
+    def test_search_final_not_exist(self):
+        client = Client()
+        response = client.get('/restaurant/search/"큐"')
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), {"message":"VALUE_DOES_NOT_EXIST"})
     
 
 
