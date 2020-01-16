@@ -573,6 +573,44 @@ class DetailTopImageBar(TestCase):
                 ]
             }
         )
+    def teat_eat_deal_detail(self):
+        client = Client()
+
+        response = client.get('/1/eat_deal_detail')
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            {
+                "result" : [
+                    {
+                        'title' : 'name',
+                        'menu' : '삼겹살',
+                        'menu_info' : '맛있다',
+                        'restaurant_id' : 1,
+                        'restaurant_info' : '맛있어',
+                        'start_date' : '2020-01-13',
+                        'end_date' : '2020-04-14',
+                        'price' : 1000,
+                        'discount_rate' : 15,
+                        'discounted_price' : 850.0,
+                        'date' : 92
+                    }
+                ]
+            }
+        )
+    
+    def test_eat_deal_detail_not_exist(self):
+        client = Client()
+
+        response = client.get('/250/eat_deal_detail')
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(
+            response.json(),
+            {
+                'result' : 'DOES_NOT_EXIST_EAT_DEAL'
+            }
+        )
 
     def tearDown(self):
         Restaurant_image.objects.all().delete()
