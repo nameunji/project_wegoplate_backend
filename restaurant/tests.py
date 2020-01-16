@@ -1,13 +1,18 @@
+import jwt
 import json
+import bcrypt
 import datetime
 
 from django.test       import TestCase
 from django.test       import Client
 from django.db.models  import Avg
-
 from freezegun         import freeze_time
-from user.models       import User, Review, Review_Star, Review_image
-from restaurant.models import *
+from django.http       import JsonResponse, HttpResponse
+
+from restaurant.models          import *
+from user.models                import User, Review, Review_Star, Review_image
+from WegoPlate_backend.settings import SECRET_KEY
+
 
 class MainTopList(TestCase):
     def setUp(self):
@@ -94,12 +99,12 @@ class MainTopList(TestCase):
             id = 1,
             nick_name = 'test',
             email     = 'test@naver.com',
-            password  = 'test1234'
+            password  = bcrypt.hashpw('test1234'.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         )
         Review_Star.objects.create(
             id = 1,
             star    = 5,
-            content = '맛있다' 
+            content = 'good' 
         )
         Review.objects.create(
             id = 1,
@@ -247,6 +252,28 @@ class MainTopList(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {"title":toplist_title, "restaurant_list":restaurant_list})
 
+    def test_token(self):
+        client = Client()
+
+        user = {
+            'email'    : 'test@naver.com',
+            'password' : 'test1234'
+        }
+        response = client.post('/user/signin', json.dumps(user), content_type='application/json')
+        return response.json()['access_token']
+
+    def test_detail_review_post(self):
+        client = Client()
+        access_token = self.test_token()
+
+        test = {
+	        "restaurant_id":"1",
+	        "content":"생각보다 맛있었어요",
+	        "star":"good"
+        }
+        response = client.post('/restaurant/1/review', json.dumps(test), **{'HTTP_AUTHORIZATION':access_token,'content_type' : 'application/json'})
+
+        self.assertEqual(response.status_code, 200)
     
 
 
@@ -332,7 +359,6 @@ class DetailTopImageBar(TestCase):
             image = 'https://mp-seoul-image-production-s3.mangoplate.com/572525_1578455243664775.jpg',
             review_id = 1
         )
-
 
         Tag.objects.create(
             id = 1,
