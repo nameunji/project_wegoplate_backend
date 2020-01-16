@@ -9,7 +9,8 @@ from .views       import (
     RestaurantNearView,
     RestaurantDetailToplistRelatedView,
     RestaurantTagview,
-    RestaurantEatDealView
+    RestaurantEatDealView,
+    RestaurantEatDealSearchView 
 )
 urlpatterns = [
     path('/topic/<int:topic_id>', TopTopic.as_view()),
@@ -22,4 +23,5 @@ urlpatterns = [
     path('/<int:restaurant_id>/related', RestaurantDetailToplistRelatedView.as_view()),
     path('/<int:restaurant_id>/tag', RestaurantTagview.as_view()),
     path('/eat_deal', RestaurantEatDealView.as_view()),
+    path('/eat_deal_search', RestaurantEatDealSearchView.as_view())
 ]
