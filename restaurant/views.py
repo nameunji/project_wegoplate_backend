@@ -379,8 +379,8 @@ class ToplistDetailView(View):
                 "image"         : element.restaurant.restaurant_image_set.filter(restaurant_id=element.restaurant_id)[0].images,
                 "user_image"    : 'https://s3-ap-northeast-2.amazonaws.com/mp-seoul-image-production/873410_1562147913864', 
                 "user_nickname" : element.restaurant.review_set.filter(restaurant_id=element.restaurant_id)[0].user.nick_name,
-                "user_review"   : element.restaurant.review_set.filter(restaurant_id=el.restaurant_id)[0].content
-            } for element in top_res]
+                "user_review"   : element.restaurant.review_set.filter(restaurant_id=element.restaurant_id)[0].content
+            } for element in top_restaurants]
 
             return JsonResponse({"toplist": toplist, "restaurants": restaurants, "offset":offset+1}, status = 200)
         else:
