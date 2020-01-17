@@ -323,3 +323,21 @@ class RestaurantEatDealDetail(View):
             return JsonResponse({'result' : eat_deal_data}, status = 200)
         except Eat_Deal.DoesNotExist:
             return JsonResponse({'result' :'DOES_NOT_EXIST_EAT_DEAL'}, status=404)
+
+class RestaurantEatDealLocationCategoryView(View):
+    def get(self, request):
+        try:
+            city = request.GET.get('city', 13)
+            location_states = Location_city.objects.prefetch_related('location_state_set').get(id = city)
+
+            states = [
+                {
+                    'id' : state['id'],
+                    'state' : state['state']
+                }
+            for state in list(location_states.location_state_set.values())]
+
+            return JsonResponse({'result' : states}, status = 200)
+        
+        except Location_city.DoesNotExist:
+            return JsonResponse({'result' : 'DOES_NOT_EXIST_EAT_DEAL_LOCATION'}, status=404)
