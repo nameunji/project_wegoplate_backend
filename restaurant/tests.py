@@ -650,6 +650,29 @@ class DetailTopImageBar(TestCase):
                 'result' : 'DOES_NOT_EXIST_EAT_DEAL'
             }
         )
+    
+    def test_detail_restaurant_eat_deal(self):
+        client = Client()
+
+        response = client.get('/restaurant/1/eat_deal')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            {
+                result: [
+                    {
+                        'eat_deal_id': 1,
+                        'menu': "삼겹살",
+                        'image': {
+                            'images': "https://mp-seoul-image-production-s3.mangoplate.com/keyword_search/meta/pictures/7zsdxmpu4kauzpk7.jpg"
+                            },
+                        'price': 1000,
+                        'discount_rate': 15,
+                        'discounted_price': 850.0
+                    }
+                ]
+            }
+        )
 
     def tearDown(self):
         Restaurant_image.objects.all().delete()

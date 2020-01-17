@@ -16,7 +16,8 @@ from .views       import (
     RestaurantEatDealDetail,
     RestaurantEatDealLocationCategoryView,
     ToplistView,
-    ToplistDetailView
+    ToplistDetailView,
+    RestaurantDetailEatDealView
 )
 urlpatterns = [
     path('/topic/<int:topic_id>', TopTopic.as_view()),
@@ -36,4 +37,5 @@ urlpatterns = [
     path('/eat_deal_location', RestaurantEatDealLocationCategoryView.as_view()),
     path('/toplist', ToplistView.as_view()),
     path('/toplist/<int:toplist_id>', ToplistDetailView.as_view()),
+    path('/<int:restaurant_id>/eat_deal', RestaurantDetailEatDealView.as_view())
 ]
