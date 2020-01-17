@@ -15,6 +15,8 @@ from WegoPlate_backend.settings import SECRET_KEY
 
 
 class MainTopList(TestCase):
+    maxDiff = None
+    @freeze_time("2012-01-14")
     def setUp(self):
         client = Client()
         
@@ -312,6 +314,43 @@ class MainTopList(TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {"message":"VALUE_DOES_NOT_EXIST"})
+
+    def test_toplist(self):
+        client = Client()
+        response = client.get('/restaurant/toplist')
+
+        result = [{
+            'id'          : 1,
+            'title'       : '2020 제주 인기 맛집 TOP 60',
+            'description' : '제주의 인기 맛집만 쏙쏙 골라 모았다!!!',
+            'image'       : 'https://mp-seoul-image-production-s3.mangoplate.com/keyword_search/meta/pictures/7zsdxmpu4kauzpk7.jpg'
+        }]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"toplists" : result, "offset":1})
+
+    def test_toplist_detail(self):
+        client = Client()
+        response = client.get('/restaurant/toplist/1')
+
+        toplist = {
+            'id'          : 1,
+            'title'       : '2020 제주 인기 맛집 TOP 60',
+            'description' : '제주의 인기 맛집만 쏙쏙 골라 모았다!!!',
+            'created_at'  : '2012-01-14'
+        }
+        restaurant = [{
+            'id'            : 1,
+            'name'          : '테스트 레스토랑',
+            'address'       : '서울 은평구 녹번동 12-1번지',
+            'image'         : 'https://mp-seoul-image-production-s3.mangoplate.com/10226_1439659099246',
+            'user_image'    : 'https://s3-ap-northeast-2.amazonaws.com/mp-seoul-image-production/873410_1562147913864',
+            'user_nickname' : 'test',
+            'user_review'   : '맛있습니다'
+        }]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"toplist" : toplist, "restaurants": restaurant, "offset": 1})
     
 
 
@@ -408,7 +447,7 @@ class DetailTopImageBar(TestCase):
             restaurant_id = 1,
             tag_id = 1
         )
-        
+
         Eat_Deal.objects.create(
             id = 1,
             price = '1000',
@@ -498,26 +537,26 @@ class DetailTopImageBar(TestCase):
                 'message' : 'DOES_NOT_EXIST_RESTAURANT'
             }
         )
-    
+
     def test_detail_restaurant_tag(self):
-        client = Client()
+            client = Client()
 
-        response = client.get('/restaurant/1/tag')
+            response = client.get('/restaurant/1/tag')
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.json(),
-            {
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(
+                response.json(),
+                {
+                    'result' : 
+                    [
+                        {
+                            'id' : 1,
+                            'tag' : '여기다'   
+                        }
+                    ]
+                }
+            )
 
-                'result' : 
-                [
-                    {
-                        'id' : 1,
-                        'tag' : '여기다' 
-                    }
-                ]
-            }
-        )  
 
 
     def test_eat_deal(self):
@@ -612,35 +651,6 @@ class DetailTopImageBar(TestCase):
             }
         )
 
-    def test_eat_deal_location(self):
-        client = Client()
-
-        response = client.get('/restaurant/eat_deal_location?city=1')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.json(),
-            {
-                'result' : [
-                    {
-                        'id' : 1,
-                        'state' : '동작구'
-                    }
-                ]
-            }
-        )
-
-    def test_eat_deal_location_not_exist(self):
-        client = Client()
-
-        response = client.get('/restaurant/eat_deal_location?city=3000')
-        self.assertEqual(response.status_code, 404)
-        self.assertEqual(
-            response.json(),
-            {
-                'result' : 'DOES_NOT_EXIST_EAT_DEAL_LOCATION'
-            }
-        )
-
     def tearDown(self):
         Restaurant_image.objects.all().delete()
         Restaurant.objects.all().delete()
@@ -655,5 +665,3 @@ class DetailTopImageBar(TestCase):
         Review_Star.objects.all().delete()
         Review_image.objects.all().delete()
         Eat_Deal.objects.all().delete()
-
-
