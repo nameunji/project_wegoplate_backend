@@ -385,3 +385,21 @@ class ToplistDetailView(View):
             return JsonResponse({"toplist": toplist, "restaurants": restaurants, "offset":offset+1}, status = 200)
         else:
             return HttpResponse(status = 404)
+
+class RestaurantDetailEatDealView(View):
+    def get(self, request, restaurant_id):
+    
+        restaurant = Restaurant.objects.prefetch_related('eat_deal_set','restaurant_image_set').get(id = restaurant_id)
+        
+        restaurant_eat_deal = [
+            {
+                'eat_deal_id' : eat_deal['id'],
+                'menu' : eat_deal['menu'],
+                'image' : list(restaurant.restaurant_image_set.values('images'))[0],
+                'price' : int(eat_deal['price']),
+                'discount_rate' : eat_deal['discount_rate'],
+                'discounted_price' : int(eat_deal['price']) - (int(eat_deal['price']) * int(eat_deal['discount_rate'])/100)
+            }
+        for eat_deal in list(restaurant.eat_deal_set.values())]
+
+        return JsonResponse({'result' : restaurant_eat_deal}, status = 200)
