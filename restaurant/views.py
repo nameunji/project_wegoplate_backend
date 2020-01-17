@@ -56,6 +56,7 @@ class RestaurantDetailInfoView(View):
         try:
             restaurant = Restaurant.objects.select_related('price_range', 'food', 'location_city', 'location_state', 'location_road', 'holiday').prefetch_related('menu_set','restaurant_info_set').get(id=restaurant_id)
 
+            restaurant_top = {"name": restaurant.name, "star": restaurant.review_set.filter(restaurant_id = restaurant.id).values('review_star__star').aggregate(avg=Avg('review_star__star'))['avg']}
             title_dict = { "parking":"주차", "number":"전화번호", "last_order":"마지막주문", "site":"웹 사이트", "breaktime":"쉬는시간", "opening_hours":"영업시간"}
 
             result = []
@@ -96,7 +97,7 @@ class RestaurantDetailInfoView(View):
                     for element in restaurant.menu_set.filter(restaurant_id=restaurant_id) ]
             })
 
-            return JsonResponse({"result":result}, status = 200)
+            return JsonResponse({"top": restaurant_top, "result":result}, status = 200)
         except Restaurant.DoesNotExist:
             return HttpResponse(status = 404)
 

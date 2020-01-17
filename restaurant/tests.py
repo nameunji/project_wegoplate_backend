@@ -191,6 +191,11 @@ class MainTopList(TestCase):
         client = Client()
         response = client.get('/restaurant/1/info')
 
+        top = {
+            "name" : "테스트 레스토랑",
+            "star" : 5.0
+        }
+
         result = [
             { "title": "주소", "content": ["서울 은평구 녹번동 12-1번지"]},
             { "title": "음식 종류", "content": ["한식"]},
@@ -204,7 +209,7 @@ class MainTopList(TestCase):
         ]
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(),{"result":result})
+        self.assertEqual(response.json(),{"top":top, "result":result})
     
     def test_Restaurant_Detail_Toplist(self):
         client = Client()
@@ -659,7 +664,7 @@ class DetailTopImageBar(TestCase):
         self.assertEqual(
             response.json(),
             {
-                result: [
+                "result": [
                     {
                         'eat_deal_id': 1,
                         'menu': "삼겹살",
