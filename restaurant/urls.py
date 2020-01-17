@@ -14,7 +14,9 @@ from .views       import (
     SearchView,
     SearchFinalView,
     RestaurantEatDealDetail,
-    RestaurantEatDealLocationCategoryView
+    RestaurantEatDealLocationCategoryView,
+    ToplistView,
+    ToplistDetailView
 )
 urlpatterns = [
     path('/topic/<int:topic_id>', TopTopic.as_view()),
@@ -31,5 +33,7 @@ urlpatterns = [
     path('/keyword', SearchView.as_view()),
     path('/search/<str:text>', SearchFinalView.as_view()),
     path('/<int:eat_deal_id>/eat_deal_detail',RestaurantEatDealDetail.as_view()),
-    path('/eat_deal_location', RestaurantEatDealLocationCategoryView.as_view())
+    path('/eat_deal_location', RestaurantEatDealLocationCategoryView.as_view()),
+    path('/toplist', ToplistView.as_view()),
+    path('/toplist/<int:toplist_id>', ToplistDetailView.as_view()),
 ]

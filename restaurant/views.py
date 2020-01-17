@@ -33,13 +33,13 @@ class RestaurantView(View):
         if restaurants.exists():  
             topic_title = restaurants[0].topic.title
             restaurant_list= [{
-                'id'    : el.restaurant.id,
-                'name'  : el.restaurant.name,
-                'state' : el.restaurant.location_state.state,
-                'food'  : el.restaurant.food.category,
-                'image' : el.restaurant.restaurant_image_set.get(restaurant_id = el.restaurant.id).images,
-                'grade' : el.restaurant.review_set.filter(restaurant_id = el.restaurant.id).values('review_star__star').aggregate(avg=Avg('review_star__star'))['avg']
-            } for el in restaurants]
+                'id'    : element.restaurant.id,
+                'name'  : element.restaurant.name,
+                'state' : element.restaurant.location_state.state,
+                'food'  : element.restaurant.food.category,
+                'image' : element.restaurant.restaurant_image_set.get(restaurant_id = element.restaurant.id).images,
+                'grade' : element.restaurant.review_set.filter(restaurant_id = element.restaurant.id).values('review_star__star').aggregate(avg=Avg('review_star__star'))['avg']
+            } for element in restaurants]
             return JsonResponse({"title" : topic_title, "restaurant_list" : restaurant_list}, status=200)
         else:
             return JsonResponse({"message":"DOES_NOT_EXIST_TOPIC"}, status = 400)
@@ -81,19 +81,19 @@ class RestaurantDetailInfoView(View):
             })
             
             info = restaurant.restaurant_info_set.values().get(restaurant_id = restaurant_id)
-            for el in info :
-                if el in title_dict and info[el] != None :
-                    result.append({"title" : title_dict[el], "content" : [info[el]]})
+            for element in info :
+                if element in title_dict and info[element] != None :
+                    result.append({"title" : title_dict[element], "content" : [info[element]]})
 
             # menu
             result.append({
                 "title"   : "메뉴",
                 "content" : [
                     {
-                        "menu"  : el.menu,
-                        "price" : el.price 
+                        "menu"  : element.menu,
+                        "price" : element.price 
                     }
-                    for el in restaurant.menu_set.filter(restaurant_id=restaurant_id) ]
+                    for element in restaurant.menu_set.filter(restaurant_id=restaurant_id) ]
             })
 
             return JsonResponse({"result":result}, status = 200)
@@ -107,11 +107,11 @@ class RestaurantDetailToplistView(View):
         if toplists.exists():
             toplist = [
                 {
-                    "id"          : el.top_list.id,
-                    "title"       : el.top_list.title,
-                    "description" : el.top_list.description,
-                    "image"       : el.top_list.image
-                } for el in toplists]
+                    "id"          : element.top_list.id,
+                    "title"       : element.top_list.title,
+                    "description" : element.top_list.description,
+                    "image"       : element.top_list.image
+                } for element in toplists]
             return JsonResponse({"result" : toplist}, status = 200)
         else:
             return HttpResponse(status = 404)
@@ -195,13 +195,13 @@ class RestaurantDetailToplistRelatedView(View):
             toplist_title = restaurants[0].top_list.title
 
             restaurant_list = [{
-                'id'    : el.restaurant.id,
-                'name'  : el.restaurant.name,
-                'state' : el.restaurant.location_state.state,
-                'food'  : el.restaurant.food.category,
-                'image' : el.restaurant.restaurant_image_set.get(restaurant_id = el.restaurant.id).images,
-                'grade' : el.restaurant.review_set.filter(restaurant_id = el.restaurant.id).values('review_star__star').aggregate(avg=Avg('review_star__star'))['avg']
-            } for el in restaurants]
+                'id'    : element.restaurant.id,
+                'name'  : element.restaurant.name,
+                'state' : element.restaurant.location_state.state,
+                'food'  : element.restaurant.food.category,
+                'image' : element.restaurant.restaurant_image_set.get(restaurant_id = element.restaurant.id).images,
+                'grade' : element.restaurant.review_set.filter(restaurant_id = element.restaurant.id).values('review_star__star').aggregate(avg=Avg('review_star__star'))['avg']
+            } for element in restaurants]
 
             return JsonResponse({"title" : toplist_title, "restaurant_list" : restaurant_list}, status=200)
 
@@ -284,14 +284,14 @@ class SearchFinalView(View):
 
         if restaurants.exists():  
             restaurant_list= [{
-                'id'     : el.id,
-                'name'   : el.name,
-                'state'  : el.location_state.state,
-                'address': '{} {} {} {}'.format(el.location_city.city, el.location_state.state, el.location_road.road, el.location_detail),
-                'food'   : el.food.category,
-                'image'  : el.restaurant_image_set.filter(restaurant_id = el.id)[0].images,
-                'grade'  : el.review_set.filter(restaurant_id = el.id).values('review_star__star').aggregate(avg=Avg('review_star__star'))['avg']
-            } for el in restaurants]
+                'id'     : element.id,
+                'name'   : element.name,
+                'state'  : element.location_state.state,
+                'address': '{} {} {} {}'.format(element.location_city.city, element.location_state.state, element.location_road.road, element.location_detail),
+                'food'   : element.food.category,
+                'image'  : element.restaurant_image_set.filter(restaurant_id = element.id)[0].images,
+                'grade'  : element.review_set.filter(restaurant_id = element.id).values('review_star__star').aggregate(avg=Avg('review_star__star'))['avg']
+            } for element in restaurants]
             return JsonResponse({"restaurant_list" : restaurant_list}, status=200)
         else:
             return JsonResponse({"message":"VALUE_DOES_NOT_EXIST"}, status = 400)
@@ -341,3 +341,47 @@ class RestaurantEatDealLocationCategoryView(View):
         
         except Location_city.DoesNotExist:
             return JsonResponse({'result' : 'DOES_NOT_EXIST_EAT_DEAL_LOCATION'}, status=404)
+
+class ToplistView(View):
+    def get(self, request):
+        offset = int(request.GET.get('offset', 0))
+        limit  = int(request.GET.get('limit', 20))
+
+        toplists = Top_List.objects.order_by('-create_at')[offset * limit : (offset+1) * limit]
+        
+        toplist = [{
+            "id"          : element.id,
+            "image"       : element.image,
+            "title"       : element.title,
+            "description" : element.description
+        } for element in toplists]
+        return JsonResponse({"toplists": toplist, "offset" : offset+1}, status = 200)
+
+
+class ToplistDetailView(View):
+    def get(self, request, toplist_id):
+        offset = int(request.GET.get('offset', 0))
+        limit  = int(request.GET.get('limit', 20))
+
+        top_restaurants = Top_lists_Restaurant.objects.select_related('top_list', 'restaurant').filter(top_list_id = toplist_id)[ offset * limit : (offset+1) * limit]
+        
+        if top_restaurants.exists():
+            toplist = {
+                "id"          : toplist_id,
+                "title"       : top_restaurants[0].top_list.title,
+                "description" : top_restaurants[0].top_list.description,
+                "created_at"  : top_restaurants[0].top_list.create_at.strftime('%Y-%m-%d')
+            }
+            restaurants = [{
+                "id"            : element.restaurant.id,
+                "name"          : element.restaurant.name,
+                "address"       : '{} {} {} {}'.format(element.restaurant.location_city.city, element.restaurant.location_state.state, element.restaurant.location_road.road, element.restaurant.location_detail),
+                "image"         : element.restaurant.restaurant_image_set.filter(restaurant_id=element.restaurant_id)[0].images,
+                "user_image"    : 'https://s3-ap-northeast-2.amazonaws.com/mp-seoul-image-production/873410_1562147913864', 
+                "user_nickname" : element.restaurant.review_set.filter(restaurant_id=element.restaurant_id)[0].user.nick_name,
+                "user_review"   : element.restaurant.review_set.filter(restaurant_id=el.restaurant_id)[0].content
+            } for element in top_res]
+
+            return JsonResponse({"toplist": toplist, "restaurants": restaurants, "offset":offset+1}, status = 200)
+        else:
+            return HttpResponse(status = 404)
