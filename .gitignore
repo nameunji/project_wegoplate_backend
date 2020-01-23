@@ -3,6 +3,7 @@
 # Edit at https://www.gitignore.io/?templates=vim,linux,macos,django,python
 .vscode
 my_settings.py
+Dockerfile
 
 ### Django ###
 *.log
