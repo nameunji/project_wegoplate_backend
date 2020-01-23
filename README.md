@@ -22,8 +22,8 @@
 - frontend git [바로가기](https://github.com/wecode-bootcamp-korea/wegoplate_frontend) 
 
 ## Contact
-Eun-ji Nam, namji117@gmail.com
-Sang-jin Seo, ttwkor12@gmail.com
+- Eun-ji Nam, namji117@gmail.com
+- Sang-jin Seo, ttwkor12@gmail.com
 
 
 
