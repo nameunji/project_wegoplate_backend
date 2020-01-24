@@ -15,7 +15,7 @@
 - Review 작성 구현
 - 검색 기능 구현
 - Eat Deal, Top-list GET API
-- Pagenation
+- Pagination
 
 ## Demo
 [![weGoplate](./screenshot.png)](https://youtu.be/R78aCEbAT-o)
